@@ -1,15 +1,17 @@
+import typing
+
 class Camera:
     def __init__(self, 
-        distance: int,      # u32
-        angle: tuple[int],  # u16 x 3
-        is_2d: bool,        # u16
-        perspective: int,   # u16
-        near: int,          # u32
-        far: int,           # u32
+        distance: int,                  # u32
+        angle: typing.Iterable[int],    # u16 x 3
+        is_2d: bool,                    # u16
+        perspective: int,               # u16
+        near: int,                      # u32
+        far: int,                       # u32
         label = None
     ):
         self.distance = distance
-        self.angle = angle
+        self.angle = (*(angle),)
         self.is_2d = is_2d
         self.perspective = perspective
         self.near = near
@@ -17,7 +19,7 @@ class Camera:
         self.label = label
 
     @classmethod
-    def from_bytes(cls, data, label = None):
+    def from_bytes(cls, data: bytes, label: str = None):
         return cls(
             distance = int.from_bytes(data[: 4], "little"),
             angle = (*(
@@ -67,3 +69,40 @@ class Camera:
             "near": self.near,
             "far": self.far
         }
+
+class CameraArray:
+    def __init__(self, cameras: typing.Iterable[Camera]):
+        self.cameras = [*cameras]
+
+    @classmethod
+    def from_bytes(cls, 
+        data: typing.Iterable[bytes],
+        labels: typing.Iterable[typing.Optional[str]]
+    ):
+        return cls(
+            Camera.from_bytes(b, label)
+            for b, label in zip(data, labels)
+        )
+
+    def to_bytes(self):
+        return b"".join(camera.to_bytes() for camera in self.cameras)
+
+    @classmethod
+    def from_files(cls, 
+        data: typing.BinaryIO,
+        labels: typing.TextIO = None,
+        n: int = 16
+    ):
+        if labels == None:
+            labels = (None,) * n
+        else:
+            labels = (*(labels.readline().strip() for _ in range(n)),)
+        data = (*(data.read(24) for _ in range(n)),)
+        return cls.from_bytes(data, labels)
+
+    @classmethod
+    def from_json(cls, obj):
+        return cls(Camera.from_json(child) for child in obj)
+
+    def to_json(self):
+        return [camera.to_json() for camera in self.cameras]

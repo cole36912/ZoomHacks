@@ -2,7 +2,7 @@ def generate_ar_code(                                           # generate actio
     address: int,                                               # memory address
     data: bytes                                                 # data to write
 ) -> bytes:
-    arr = bytearray(data + b"\0" * (7 - (len(data) - 1) % 8))   # buffer to a multiple of 8 and put in a mutable object
+    arr = bytearray(data + b"\0" * (7 - (len(data) - 1) % 8))   # pad to a multiple of 8 and copy to a mutable object
     for i in range(0, len(arr), 4):
         arr[i : i + 4] = arr[i + 3 : i - 1 if i else None : -1] # reverse every four bytes
     return b"".join((

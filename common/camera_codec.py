@@ -40,7 +40,7 @@ class Camera:
                 self.angle[i].to_bytes(2, "little")
                 for i in range(3)
             ),
-            b"\0\0",
+            b"\0\0", # unused
             b"\1\0" if self.is_2d else b"\0\0",
             self.perspective.to_bytes(2, "little"),
             self.near.to_bytes(4, "little"),

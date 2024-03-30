@@ -1,5 +1,3 @@
-code = 0xE0000000
-
 def generate_ar_code(
     address: int,
     data: bytes
@@ -8,9 +6,10 @@ def generate_ar_code(
     for i in range(0, len(data), 4):
         data[i : i + 4] = data[i + 3 : i - 1 if i else None : -1]
     return b"".join((
-        (code + address).to_bytes(4),
+        (0xE0000000 | address).to_bytes(4),
         len(data).to_bytes(4),
-        data
+        data,
+        b"\xD2\xB4\xC0\x1E\x36\x91\x20\x00"
     ))
 
 def generate_pretty_ar_code(

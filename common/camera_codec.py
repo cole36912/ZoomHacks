@@ -45,6 +45,18 @@ class Camera:
             self.far.to_bytes(4, "little")
         ))
 
+    @classmethod
+    def from_json(cls, obj):
+        return cls(
+            distance = obj["distance"],
+            angle = (*obj["angle"],),
+            is_2d = obj["is_2d"],
+            perspective = obj["perspective"],
+            near = obj["near"],
+            far = obj["far"],
+            label = obj["name"]
+        )
+
     def to_json(self):
         return {
             "name": self.label,

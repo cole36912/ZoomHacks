@@ -21,3 +21,10 @@ def generate_pretty_ar_code(                                    # generate text 
         code[i : i + 8].hex(" ", 4).upper()
         for i in range(0, len(code), 8)
     )
+
+class BracketFunction:
+    def __init__(self, f):
+        self.f = f
+
+    def __getitem__(self, arg):
+        return self.f(arg)

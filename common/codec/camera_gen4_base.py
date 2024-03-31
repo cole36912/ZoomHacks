@@ -13,7 +13,7 @@ class CameraGenIVBase(CameraBase):
     ):
         super().__init__(label)
         self.distance = distance
-        self.angle = (*(angle),)
+        self.angle = (*angle,)
         self.is_2d = is_2d
         self.perspective = perspective
         self.near = near
@@ -23,10 +23,10 @@ class CameraGenIVBase(CameraBase):
     def from_bytes(cls, data: bytes, label: str = None, *other_args, **other_kwargs):
         return cls(
             distance = int.from_bytes(data[: 4], "little"),
-            angle = (*(
+            angle = (
                 int.from_bytes(data[i : i + 2], "little")
                 for i in range(4, 10, 2)
-            ),),
+            ),
             is_2d = bool(int.from_bytes(data[12 : 14], "little")),
             perspective = int.from_bytes(data[14 : 16], "little"),
             near = int.from_bytes(data[16 : 20], "little"),
@@ -36,7 +36,7 @@ class CameraGenIVBase(CameraBase):
             **other_kwargs
         )
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         return b"".join((
             self.distance.to_bytes(4, "little"),
             *(
@@ -62,7 +62,7 @@ class CameraGenIVBase(CameraBase):
             label = obj["name"]
         )
 
-    def to_json(self):
+    def to_json(self) -> dict:
         return {
             "name": self.label,
             "distance": self.distance,

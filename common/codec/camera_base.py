@@ -9,7 +9,7 @@ class CameraBase:
     def from_bytes(cls, data: bytes, label: str = None):
         raise NotImplementedError()
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         raise NotImplementedError()
 
 @BracketFunction
@@ -37,12 +37,16 @@ def CameraArray(CameraType: type):
             labels: typing.TextIO = None,
             n: int = 16
         ):
+            parts = (data.read(CameraType.byte_length) for _ in range(n))
             if labels == None:
-                labels = (None,) * n
-            else:
-                labels = (*(labels.readline().strip() for _ in range(n)),)
-            data = (*(data.read(CameraType.byte_length) for _ in range(n)),)
-            return cls.from_bytes(data, labels)
+                return cls.from_bytes(
+                    parts,
+                    (None for _ in range(n))
+                )
+            return cls.from_bytes(
+                parts,
+                (label.strip() for label in labels)
+            )
 
         @classmethod
         def from_json(cls, obj):

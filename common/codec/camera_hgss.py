@@ -46,7 +46,7 @@ class CameraHGSS(CameraGenIVBase):
             unk_2_1 = int.from_bytes(data[34 : 36], "little")
         )
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         return b"".join((
             super().to_bytes(),
             self.unk_0.to_bytes(4, "little"),

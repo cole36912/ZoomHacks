@@ -6,7 +6,7 @@ import common.util as util
 import io
 
 # DPPt
-with open("data/camera_data_dppt.bin", "rb") as data:
+with open("data/original/binary/camera_data_dppt.bin", "rb") as data:
     data = data.read(CameraDPPt.byte_length * 16)
     with open("ar_codes/dp/control.txt", "w") as file:                        # code for default values, should have no effect
         file.write(util.generate_pretty_ar_code(0x021F6608, data))
@@ -21,7 +21,7 @@ with open("data/camera_data_dppt.bin", "rb") as data:
         file.write(util.generate_pretty_ar_code(0x021F8AE4, arr.to_bytes()))
 
 # HGSS
-with open("data/camera_data_hgss.bin", "rb") as data:
+with open("data/original/binary/camera_data_hgss.bin", "rb") as data:
     data = data.read(CameraHGSS.byte_length * 17)
     with open("ar_codes/hgss/control.txt", "w") as file:                        # code for default values, should have no effect
         file.write(util.generate_pretty_ar_code(0x02206478, data))

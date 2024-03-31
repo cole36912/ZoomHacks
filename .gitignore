@@ -1,5 +1,6 @@
 .venv
 *.pyc
 ar_codes/
-data/*.json
+data/original/json/
+data/modified/
 **/.DS_Store

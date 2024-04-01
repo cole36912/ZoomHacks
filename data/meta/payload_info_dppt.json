@@ -3,5 +3,42 @@
         "dp": "0x021F6608",
         "pt": "0x021F8AE4"
     },
-    "count": 16
+    "count": 16,
+    "schema": {
+        "length": 24,
+        "parts": {
+            "distance": {
+                "type": "uint32",
+                "offset": 0
+            },
+            "angle_x": {
+                "type": "uint16",
+                "offset": 4
+            },
+            "angle_y": {
+                "type": "uint16",
+                "offset": 6
+            },
+            "angle_z": {
+                "type": "uint16",
+                "offset": 8
+            },
+            "is_ortho": {
+                "type": "uint16",
+                "offset": 12
+            },
+            "perspective": {
+                "type": "uint16",
+                "offset": 14
+            },
+            "clip_near": {
+                "type": "uint32",
+                "offset": 16
+            },
+            "clip_far": {
+                "type": "uint32",
+                "offset": 20
+            }
+        }
+    }
 }

@@ -2,5 +2,62 @@
     "addresses": {
         "hgss": "0x02206478"
     },
-    "count": 17
+    "count": 17,
+    "schema": {
+        "length": 36,
+        "parts": {
+            "distance": {
+                "type": "uint32",
+                "offset": 0
+            },
+            "angle_x": {
+                "type": "uint16",
+                "offset": 4
+            },
+            "angle_y": {
+                "type": "uint16",
+                "offset": 6
+            },
+            "angle_z": {
+                "type": "uint16",
+                "offset": 8
+            },
+            "is_ortho": {
+                "type": "uint16",
+                "offset": 12
+            },
+            "perspective": {
+                "type": "uint16",
+                "offset": 14
+            },
+            "clip_near": {
+                "type": "uint32",
+                "offset": 16
+            },
+            "clip_far": {
+                "type": "uint32",
+                "offset": 20
+            },
+            "unk_0": {
+                "type": "uint32",
+                "offset": 24
+            },
+            "unk_1_0": {
+                "type": "uint16",
+                "offset": 28
+            },
+            "unk_1_1": {
+                "type": "int16",
+                "offset": 30
+            },
+            "unk_2_0": {
+                "type": "uint16",
+                "offset": 32
+            },
+            "unk_2_1": {
+                "type": "int16",
+                "offset": 34
+            }
+        }
+    }
 }

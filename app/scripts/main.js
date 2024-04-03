@@ -1,5 +1,6 @@
 const VERSION = "v0.0.1";
 const DATA_PATH_META = "data/meta/payload_info_{data}.json";
+const DATA_PATH_NAMES = "data/meta/camera_names_{data}.json";
 const DATA_PATH_BINARY_ORIGINAL = "data/original/binary/camera_data_{data}.bin";
 const DATA_PATH_BINARY_MODIFIED = "data/modified/{mod}/binary/camera_data_{data}.bin";
 const DATA = ["dppt", "hgss"];
@@ -8,22 +9,28 @@ const MODIFICATIONS = [];
 document.getElementById("version").innerHTML = VERSION;
 const app = document.getElementById("app");
 
-/**@returns {string}*/ function get_raw(/*string*/ url){
-    /**@type {XMLHttpRequest}*/ const request = new XMLHttpRequest();
+function get_text(url) {
+    const request = new XMLHttpRequest();
     request.open("GET", url, false);
     request.send(null);
-    return request.responseText
+    return request.responseText;
 }
 
-
+function get(url) {
+    const request = new XMLHttpRequest();
+    request.open("GET", url, false);
+    request.send(null);
+    return request.response;
+}
 
 function load_data(meta, data) {
-
+    app.innerHTML = "";
 }
 
 function load_default_data(data) {
-    const meta = JSON.parse(get_raw(DATA_PATH_META.replace("{data}", data)));
-    console.log(meta);
+    const meta = JSON.parse(get_text(DATA_PATH_META.replace("{data}", data)));
+    const binary_data = JSON.parse(get(DATA_PATH_BINARY_ORIGINAL.replace("{data}", data)));
+    load_data(meta, binary_data);
 }
 
 {

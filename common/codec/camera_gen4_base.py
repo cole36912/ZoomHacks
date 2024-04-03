@@ -3,12 +3,12 @@ from common.codec.camera_base import CameraBase
 
 class CameraGenIVBase(CameraBase):
     def __init__(self, 
-        distance: int,                  # u32
+        distance: int,                  # s32
         angle: typing.Iterable[int],    # u16 x 3
         is_2d: bool,                    # u16
         perspective: int,               # u16
-        near: int,                      # u32
-        far: int,                       # u32
+        near: int,                      # s32
+        far: int,                       # s32
         label = None
     ):
         super().__init__(label)

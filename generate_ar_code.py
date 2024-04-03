@@ -24,6 +24,15 @@ with open("data/original/binary/camera_data_dppt.bin", "rb") as data, \
     with open("ar_codes/pt/2d.txt", "w") as file:                             # code to make all cameras the same as the building camera
         file.write(util.generate_pretty_ar_code(addr_pt, arr.to_bytes()))
 
+with open("data/modified/2x_zoom_out/binary/camera_data_dppt.bin", "rb") as data, \
+    open("data/meta/payload_info_dppt.json", "r") as meta:
+    meta = json.load(meta)
+    addr_dp = int(meta["addresses"]["dp"], 16)
+    addr_pt = int(meta["addresses"]["pt"], 16)
+    data = data.read(CameraDPPt.byte_length * meta["count"])
+    with open("ar_codes/dp/2x_zoom_out.txt", "w") as file:                        # code for default values, should have no effect
+        file.write(util.generate_pretty_ar_code(addr_dp, data))
+
 # HGSS
 with open("data/original/binary/camera_data_hgss.bin", "rb") as data, \
     open("data/meta/payload_info_hgss.json", "r") as meta:

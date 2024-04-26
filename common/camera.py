@@ -3,7 +3,6 @@ import json
 
 class Camera:
     def __init__(self, payload_info: dict, parts: dict, label: str = None):
-        self.payload_info = payload_info
         self.parts = parts
         self.label = label
 
@@ -37,18 +36,25 @@ class Camera:
             label
         )
 
-    def to_bytes(self) -> bytes:
-        data = bytearray(length = self.payload_info["schema"]["length"])
-        for key, info in self.payload_info["schema"]["parts"].items():
-            self.write_value(info["type"], self.parts[key], info["offset"], data)
+    def to_bytes(self, payload_info: dict, default_values: dict) -> bytes:
+        data = bytearray(length = payload_info["schema"]["length"])
+        for key, info in payload_info["schema"]["parts"].items():
+            write_value(
+                info["type"],
+                self.parts[key] if key in self.parts else default_values[key],
+                info["offset"],
+                data
+            )
         return bytes(data)
 
     def __str__(self):
-        return f"{self.label}\nMeta: {self.payload_info}\nData: {self.parts}"
+        return f"{self.label}\nData: {self.parts}"
 
 class CameraArray:
-    def __init__(self, cameras: typing.Iterable[Camera]):
+    def __init__(self, payload_info: dict, cameras: typing.Iterable[Camera]):
+        self.payload_info = payload_info
         self.cameras = [*cameras]
+        self.default_values = self.cameras[0].parts.copy()
 
     @classmethod
     def from_bytes(cls,
@@ -57,12 +63,18 @@ class CameraArray:
         labels: typing.Iterable[typing.Optional[str]]
     ):
         return cls(
-            Camera.from_bytes(payload_info, b, label)
-            for b, label in zip(data, labels)
+            payload_info,
+            (
+                Camera.from_bytes(payload_info, b, label)
+                for b, label in zip(data, labels)
+            )
         )
 
     def to_bytes(self) -> bytes:
-        return b"".join(camera.to_bytes() for camera in self.cameras)
+        return b"".join(
+            camera.to_bytes(self.payload_info, self.default_values)
+            for camera in self.cameras
+        )
 
     @classmethod
     def from_files(cls, 

@@ -17,3 +17,12 @@ def build_element_from_html(tag, html, props = {}):
 def clean_errors():
     for element in document.querySelectorAll("body > .py-error"):
         element.remove()
+
+def make_action_link(text, action = lambda e : None):
+    return build_element("a",
+        text,
+        props = {
+            "href": "javascript:void",
+            "onclick": action
+        }
+    )

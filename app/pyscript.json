@@ -5,6 +5,9 @@
         "data/meta/camera_names_dppt.txt": "data/meta/camera_names_dppt.txt",
         "data/meta/camera_names_hgss.txt": "data/meta/camera_names_hgss.txt",
         "data/original/binary/camera_data_dppt.bin": "data/original/binary/camera_data_dppt.bin",
-        "data/original/binary/camera_data_hgss.bin": "data/original/binary/camera_data_hgss.bin"
+        "data/original/binary/camera_data_hgss.bin": "data/original/binary/camera_data_hgss.bin",
+
+        "scripts/common/camera.py": "scripts/common/camera.py",
+        "scripts/html_tools.py": "scripts/html_tools.py"
     }
 }

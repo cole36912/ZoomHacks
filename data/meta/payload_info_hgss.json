@@ -8,35 +8,43 @@
         "parts": {
             "distance": {
                 "type": "uint32",
-                "offset": 0
+                "offset": 0,
+                "context": "float"
             },
             "angle_x": {
                 "type": "uint16",
-                "offset": 4
+                "offset": 4,
+                "context": "angle"
             },
             "angle_y": {
                 "type": "uint16",
-                "offset": 6
+                "offset": 6,
+                "context": "angle"
             },
             "angle_z": {
                 "type": "uint16",
-                "offset": 8
+                "offset": 8,
+                "context": "angle"
             },
             "is_ortho": {
                 "type": "uint16",
-                "offset": 12
+                "offset": 12,
+                "context": "bool"
             },
             "perspective": {
                 "type": "uint16",
-                "offset": 14
+                "offset": 14,
+                "context": "angle"
             },
             "clip_near": {
                 "type": "uint32",
-                "offset": 16
+                "offset": 16,
+                "context": "float"
             },
             "clip_far": {
                 "type": "uint32",
-                "offset": 20
+                "offset": 20,
+                "context": "float"
             },
             "unk_0": {
                 "type": "uint32",

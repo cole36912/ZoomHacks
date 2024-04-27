@@ -1,3 +1,6 @@
+body {
+    font-family: sans-serif;
+}
 table {
     border-collapse: collapse;
 }
@@ -7,4 +10,17 @@ td, th {
 }
 .id_col {
     text-align: center;
+}
+input:invalid {
+    background-color: lightpink;
+}
+input {
+    text-align: right;
+}
+td input {
+    width: 100%;
+    box-sizing: border-box;
+}
+td input[type=checkbox] {
+    margin: 0 auto;
 }

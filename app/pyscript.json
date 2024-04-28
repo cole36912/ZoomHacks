@@ -8,6 +8,7 @@
         "data/original/binary/camera_data_hgss.bin": "data/original/binary/camera_data_hgss.bin",
 
         "scripts/common/camera.py": "scripts/common/camera.py",
+        "scripts/common/util.py": "scripts/common/util.py",
         "scripts/html_util.py": "scripts/html_util.py",
         "scripts/data_contexts.py": "scripts/data_contexts.py"
     }

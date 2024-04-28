@@ -1,11 +1,13 @@
 body {
     font-family: sans-serif;
 }
-table {
+.table {
     border-collapse: collapse;
 }
-td, th {
+.table td, .table th {
     border: thin solid black;
+}
+td, th {
     padding: 0.5em;
 }
 .id_col {
@@ -17,10 +19,13 @@ input:invalid {
 input {
     text-align: right;
 }
-td input {
+td input, td select {
     width: 100%;
     box-sizing: border-box;
 }
 td input[type=checkbox] {
     margin: 0 auto;
 }
+/* .menu_bar td {
+    padding-right: 1em;
+} */

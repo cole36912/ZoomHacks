@@ -7,8 +7,11 @@ class DataContext:
         self.element.onchange = self.update_row
         self.size = size
 
+    def is_valid(self) -> bool:
+        return self.element.validity.valid
+
     def update_row(self, event):
-        if self.element.validity.valid:
+        if self.is_valid():
             value = self.get_value()
             for context in self.row:
                 if context is not self:

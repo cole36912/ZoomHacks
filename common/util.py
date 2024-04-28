@@ -28,3 +28,28 @@ class BracketFunction:
 
     def __getitem__(self, arg):
         return self.f(arg)
+
+def re_nat_lte(x: int):
+    options = []
+    x = str(x)
+    digits = len(x)
+    options.append("0")
+    if digits > 1:
+        options.append(f"[1-9][0-9]{{0,{digits - 2}}}")
+    if x[0] != "1":
+        options.append(f"[1-{chr(ord(x[0]) - 1)}][0-9]{{{digits - 1}}}")
+    for i in range(1, digits - 1):
+        if x[i] != "0":
+            options.append(f"{x[: i]}[0-{chr(ord(x[i]) - 1)}][0-9]{{{digits - i - 1}}}")
+    options.append(f"{x[: -1]}[0-{x[-1]}]")
+    return f"(?:{'|'.join(options)})"
+
+def re_nat_lt(x: int):
+    return re_nat_lte(x - 1)
+
+def size_of(value_type):
+    if value_type in ("int16", "uint16"):
+        return 2
+    if value_type in ("int32", "uint32"):
+        return 4
+    raise ValueError(value_type)

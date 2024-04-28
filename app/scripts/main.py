@@ -7,7 +7,7 @@ from scripts.html_util import build_element, make_action_link, bytes_to_buffer
 from scripts.data_contexts import DATA_CONTEXTS, UIntContext, HexContext
 from io import StringIO
 
-VERSION = "v0.0.6"
+VERSION = "v0.0.7"
 DATA_PATH_META = "data/meta/payload_info_{data}.json"
 DATA_PATH_NAMES = "data/meta/camera_names_{data}.txt"
 DATA_PATH_BINARY_ORIGINAL = "data/original/binary/camera_data_{data}.bin"
@@ -22,11 +22,6 @@ class App:
     camera_array: CameraArray = None
 
     @classmethod
-    def size_of(cls, key):
-        value_type = cls.camera_array.payload_info["schema"]["parts"][key]["type"]
-        return util.size_of(value_type)
-
-    @classmethod
     def context_of(cls, key):
         part = cls.camera_array.payload_info["schema"]["parts"][key]
         if "context" in part:
@@ -38,7 +33,7 @@ class App:
         camera = cls.camera_array.cameras[i]
         contextual_values = {}
         for key, value in camera.parts.items():
-            size = cls.size_of(key)
+            size = cls.camera_array.payload_info["schema"]["parts"][key]["size"]
             row = (
                 cls.context_of(key)(value, size),
                 UIntContext(value, size),

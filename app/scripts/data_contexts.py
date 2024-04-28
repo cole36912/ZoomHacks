@@ -1,4 +1,5 @@
 from scripts.html_util import build_element
+from scripts.common import util
 
 class DataContext:
     def __init__(self, value, size: int):
@@ -32,16 +33,19 @@ class IntContext(DataContext):
     def create_element(value: int, size: int):
         return build_element("input", props = {
             "type": "number",
-            "value": value,
+            "value": util.uint_to_int(size, value),
             "max": (1 << 8 * size - 1) - 1,
             "min": -(1 << 8 * size - 1),
             "required": True
         })
 
     def get_value(self) -> int:
-        return int(self.element.value)
+        return util.int_to_uint(self.size, int(self.element.value))
 
-class UIntContext(IntContext):
+    def set_value(self, value: int):
+        self.element.value = util.uint_to_int(self.size, value)
+
+class UIntContext(DataContext):
     @staticmethod
     def create_element(value: int, size: int):
         return build_element("input", props = {
@@ -51,6 +55,9 @@ class UIntContext(IntContext):
             "min": 0,
             "required": True
         })
+
+    def get_value(self) -> int:
+        return int(self.element.value)
 
 class HexContext(DataContext):
     def __init__(self, value, size: int):
@@ -75,6 +82,24 @@ class HexContext(DataContext):
         self.element.value = f"{{:0{2 * self.size}X}}".format(value)
 
 class FloatContext(DataContext):
+    @staticmethod
+    def create_element(value: int, size: int):
+        return build_element("input", props = {
+            "type": "number",
+            "value": round(util.uint_to_int(size, value) / 4096, 4),
+            "max": (1 << 8 * size - 13) - 2e-4,
+            "min": -(1 << 8 * size - 13),
+            "step": 1e-4,
+            "required": True
+        })
+
+    def get_value(self) -> int:
+        return util.int_to_uint(self.size, round(float(self.element.value) * 4096))
+
+    def set_value(self, value: int):
+        self.element.value = round(util.uint_to_int(self.size, value) / 4096, 4)
+
+class UFloatContext(DataContext):
     @staticmethod
     def create_element(value: int, size: int):
         return build_element("input", props = {
@@ -127,8 +152,10 @@ class BooleanContext(DataContext):
 
 DATA_CONTEXTS = {
     "int": IntContext,
+    "uint": UIntContext,
     "hex": HexContext,
     "float": FloatContext,
+    "ufloat": UFloatContext,
     "angle": AngleContext,
     "bool": BooleanContext
 }

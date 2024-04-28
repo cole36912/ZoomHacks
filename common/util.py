@@ -32,24 +32,23 @@ class BracketFunction:
 def re_nat_lte(x: int):
     options = []
     x = str(x)
-    digits = len(x)
-    options.append("0")
+    digits = len(x) # n
+    options.append("0") # allow 0
     if digits > 1:
-        options.append(f"[1-9][0-9]{{0,{digits - 2}}}")
+        options.append(f"[1-9][0-9]{{0,{digits - 2}}}") # allow [1, 9{n-1}]
     if x[0] != "1":
-        options.append(f"[1-{chr(ord(x[0]) - 1)}][0-9]{{{digits - 1}}}")
-    for i in range(1, digits - 1):
+        options.append(f"[1-{chr(ord(x[0]) - 1)}][0-9]{{{digits - 1}}}") # allow [10{n-1}, (x[0]-1)9{n-1}]
+    for i in range(1, digits - 1): # i in [1, n-2]
         if x[i] != "0":
-            options.append(f"{x[: i]}[0-{chr(ord(x[i]) - 1)}][0-9]{{{digits - i - 1}}}")
-    options.append(f"{x[: -1]}[0-{x[-1]}]")
+            options.append(f"{x[: i]}[0-{chr(ord(x[i]) - 1)}][0-9]{{{digits - i - 1}}}") # allow [x[0-(i-1)]0{n-i}, x[0-(i-1)](x[i]-1)0{n-i-1}]
+    options.append(f"{x[: -1]}[0-{x[-1]}]") # allow [x[0-(n-2)]0, x]
     return f"(?:{'|'.join(options)})"
 
 def re_nat_lt(x: int):
     return re_nat_lte(x - 1)
 
-def size_of(value_type):
-    if value_type in ("int16", "uint16"):
-        return 2
-    if value_type in ("int32", "uint32"):
-        return 4
-    raise ValueError(value_type)
+def uint_to_int(size: int, value: int) -> int:
+    return int.from_bytes(value.to_bytes(size), signed = True)
+
+def int_to_uint(size: int, value: int) -> int:
+    return int.from_bytes(value.to_bytes(size, signed = True))

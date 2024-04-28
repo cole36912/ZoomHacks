@@ -8,20 +8,18 @@ class Camera:
         self.label = label
 
     @staticmethod
-    def read_value(value_type: str, offset: int, data: bytes) -> typing.Any:
-        return int.from_bytes(data[offset : offset + util.size_of(value_type)], "little")
+    def read_value(size: int, offset: int, data: bytes) -> typing.Any:
+        return int.from_bytes(data[offset : offset + size], "little")
 
     @staticmethod
-    def write_value(value_type: str, value, offset: int, data: bytearray):
-        size = util.size_of(value_type)
+    def write_value(size: int, value, offset: int, data: bytearray):
         data[offset : offset + size] = value.to_bytes(size, "little")
-        
 
     @classmethod
     def from_bytes(cls, payload_info: dict, data: bytes, label: str = None):
         return cls(
             {
-                key: cls.read_value(info["type"], info["offset"], data)
+                key: cls.read_value(info["size"], info["offset"], data)
                 for key, info in payload_info["schema"]["parts"].items()
             },
             label
@@ -31,7 +29,7 @@ class Camera:
         data = bytearray(payload_info["schema"]["length"])
         for key, info in payload_info["schema"]["parts"].items():
             self.write_value(
-                info["type"],
+                info["size"],
                 self.parts[key] if key in self.parts else default_values[key],
                 info["offset"],
                 data
@@ -112,7 +110,7 @@ class CameraArray:
         self.cameras[slice] = value
 
     def is_safe_value(self, part: str, value: int):
-        return value >= 0 and value < 1 << 8 * util.size_of(self.payload_info["schema"]["parts"][part]["type"])
+        return value >= 0 and value < 1 << 8 * self.payload_info["schema"]["parts"][part]["size"]
 
     def set_part_safe(self, i: int, part: str, value: int):
         if self.is_safe_value(part, value):

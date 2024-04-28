@@ -1,4 +1,5 @@
 from pyscript import document
+import js
 
 def build_element(tag, *children, props = {}):
     ret = document.createElement(tag)
@@ -26,3 +27,10 @@ def make_action_link(text, action = lambda e : None):
             "onclick": action
         }
     )
+
+def bytes_to_buffer(b: bytes):
+    buffer = js.ArrayBuffer.new(len(b))
+    view = js.DataView.new(buffer)
+    for i, x in enumerate(b):
+        view.setUint8(i, x)
+    return buffer

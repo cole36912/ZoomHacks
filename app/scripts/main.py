@@ -3,11 +3,11 @@ import js
 import json
 from scripts.common.camera import Camera, CameraArray
 from scripts.common import util
-from scripts.html_util import build_element, make_action_link
+from scripts.html_util import build_element, make_action_link, bytes_to_buffer
 from scripts.data_contexts import DATA_CONTEXTS, UIntContext, HexContext
 from io import StringIO
 
-VERSION = "v0.0.5"
+VERSION = "v0.0.6"
 DATA_PATH_META = "data/meta/payload_info_{data}.json"
 DATA_PATH_NAMES = "data/meta/camera_names_{data}.txt"
 DATA_PATH_BINARY_ORIGINAL = "data/original/binary/camera_data_{data}.bin"
@@ -120,6 +120,31 @@ class App:
         )
 
     @classmethod
+    def generate_ar_codes(cls):
+        cls.render_nodes(
+            build_element("table",
+                build_element("tr",
+                    build_element("td",
+                        make_action_link("Back", lambda e : cls.show_cameras())
+                    )
+                ),
+                props = {"className": "menu_bar"}
+            ),
+            *(
+                build_element("details",
+                    build_element("summary", key),
+                    build_element("code", props = {
+                        "innerHTML": util.generate_pretty_ar_code(
+                            int(address, 16),
+                            cls.camera_array.to_bytes()
+                        ).replace("\n", "<br>")
+                    })
+                )
+                for key, address in cls.camera_array.payload_info["addresses"].items()
+            )
+        )
+
+    @classmethod
     def copy_camera(cls, source: int):
         targets = window.prompt("Enter target indices separated by commas or \"*\" for all")
         n = len(cls.camera_array.cameras)
@@ -170,11 +195,34 @@ class App:
     def export_camera(cls, i: int):
         build_element("a", props = {
             "href": window.URL.createObjectURL(
-                js.Blob.new(
-                    (json.dumps(cls.camera_array[i].to_json()),)
-                )
+                js.Blob.new((
+                    json.dumps(cls.camera_array[i].to_json()),
+                ))
             ),
             "download": "camera.json"
+        }).click()
+
+    @classmethod
+    def export_array_data(cls):
+        build_element("a", props = {
+            "href": window.URL.createObjectURL(
+                js.Blob.new((
+                    bytes_to_buffer(cls.camera_array.to_bytes()),
+                ))
+            ),
+            "download": "camera_data.bin"
+        }).click()
+
+    @classmethod
+    def export_array_names(cls):
+        build_element("a", props = {
+            "href": window.URL.createObjectURL(
+                js.Blob.new((
+                    f"{camera.label}\n"
+                    for camera in cls.camera_array.cameras
+                ))
+            ),
+            "download": "camera_names.txt"
         }).click()
 
     @classmethod
@@ -187,6 +235,15 @@ class App:
                     ),
                     build_element("td",
                         make_action_link("Batch Action...", lambda e : cls.batch_action())
+                    ),
+                    build_element("td",
+                        make_action_link("Generate AR Codes", lambda e : cls.generate_ar_codes())
+                    ),
+                    build_element("td",
+                        make_action_link("Export data to file...", lambda e : cls.export_array_data())
+                    ),
+                    build_element("td",
+                        make_action_link("Export names to file...", lambda e : cls.export_array_names())
                     )
                 ),
                 props = {"className": "menu_bar"}
@@ -218,7 +275,13 @@ class App:
             targets = targets_input.value
             part = part_select.value
             op = op_select.value
-            op_val = int(value_input.value)
+            if op == "mult":
+                op_val = float(value_input.value)
+            else:
+                try:
+                    op_val = int(value_input.value)
+                except ValueError:
+                    return window.alert("Integer required for selected operation")
             n = len(cls.camera_array.cameras)
             if targets == "*":
                 targets = (*range(n),)
@@ -233,7 +296,7 @@ class App:
                         values[i] += op_val
                 elif op == "mult":
                     for i in range(len(values)):
-                        values[i] *= op_val
+                        values[i] = round(values[i] * op_val)
                 elif op == "or":
                     for i in range(len(values)):
                         values[i] |= op_val
@@ -259,7 +322,8 @@ class App:
                                 "pattern": (
                                     v := util.re_nat_lt(len(cls.camera_array.cameras)),
                                     f"^ *\\* *| *{v}(?: *, *{v})* *$"
-                                )[1]
+                                )[1],
+                                "required": True
                             })
                         )
                     ),
@@ -296,7 +360,10 @@ class App:
                         build_element("td", "Value (Base 10 integer):"),
                         build_element("td",
                             value_input := build_element("input", props = {
-                                "type": "number"
+                                "type": "text",
+                                "value": "2731713",
+                                "pattern": "^ *[0-9]*\\.?[0-9]* *$",
+                                "required": True
                             })
                         )
                     )
@@ -344,29 +411,42 @@ class App:
     @classmethod
     def main(cls):
         cls.render_nodes(
-            data_selector := build_element("select", *(
-                build_element("option",
-                    f"{item} default",
-                    props = {"value": item}
+            build_element("table",
+                build_element("tr",
+                    build_element("td",
+                        data_selector := build_element("select", *(
+                            build_element("option",
+                                f"{item} default",
+                                props = {"value": item}
+                            )
+                            for item in DATA
+                        ))
+                    ),
+                    build_element("td",
+                        build_element("button",
+                            "Use data",
+                            props = {
+                                "onclick": lambda e : cls.load_default_data(data_selector.value)
+                            }
+                        )
+                    )
+                ),
+                build_element("tr",
+                    build_element("td",
+                        payload_selector := build_element("select", *(
+                            build_element("option",
+                                item,
+                                props = {"value": item}
+                            )
+                            for item in DATA
+                        ))
+                    ),
+                    build_element("td",
+                        build_element("button",
+                            "Use data from disk..."
+                        )
+                    )
                 )
-                for item in DATA
-            )),
-            build_element("button",
-                "Use data",
-                props = {
-                    "onclick": lambda e : cls.load_default_data(data_selector.value)
-                }
-            ),
-            build_element("br"),
-            payload_selector := build_element("select", *(
-                build_element("option",
-                    item,
-                    props = {"value": item}
-                )
-                for item in DATA
-            )),
-            build_element("button",
-                "Use data from disk..."
             )
         )
 App.main()

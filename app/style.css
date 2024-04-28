@@ -29,3 +29,6 @@ td input[type=checkbox] {
 /* .menu_bar td {
     padding-right: 1em;
 } */
+details {
+    padding: 1em;
+}

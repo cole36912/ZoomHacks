@@ -28,9 +28,9 @@ class Camera:
         )
 
     def to_bytes(self, payload_info: dict, default_values: dict) -> bytes:
-        data = bytearray(length = payload_info["schema"]["length"])
+        data = bytearray(payload_info["schema"]["length"])
         for key, info in payload_info["schema"]["parts"].items():
-            write_value(
+            self.write_value(
                 info["type"],
                 self.parts[key] if key in self.parts else default_values[key],
                 info["offset"],

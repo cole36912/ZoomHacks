@@ -131,8 +131,9 @@ class App:
                     build_element("code", props = {
                         "innerHTML": util.generate_pretty_ar_code(
                             int(address, 16),
-                            cls.camera_array.to_bytes()
-                        ).replace("\n", "<br>")
+                            cls.camera_array.to_bytes(),
+                            "<br>"
+                        )
                     })
                 )
                 for key, address in cls.camera_array.payload_info["addresses"].items()
@@ -142,6 +143,8 @@ class App:
     @classmethod
     def copy_camera(cls, source: int):
         targets = window.prompt("Enter target indices separated by commas or \"*\" for all")
+        if targets == None:
+            return
         n = len(cls.camera_array.cameras)
         if targets == "*":
             targets = {*range(n)}
@@ -159,6 +162,8 @@ class App:
     @classmethod
     def swap_camera(cls, source: int):
         target = window.prompt("Enter target index")
+        if target == None:
+            return
         n = len(cls.camera_array.cameras)
         try:
             target = int(target)

@@ -14,10 +14,11 @@ def generate_ar_code(                                           # generate actio
 
 def generate_pretty_ar_code(                                    # generate text formatted code
     address: int,                                               # memory address
-    data: bytes                                                 # data to write
+    data: bytes,                                                # data to write
+    sep: str = "\n"
 ) -> str:
     code = generate_ar_code(address, data)                      # get code as bytes
-    return "\n".join(                                           # format code as text
+    return sep.join(                                            # format code as text
         code[i : i + 8].hex(" ", 4).upper()
         for i in range(0, len(code), 8)
     )

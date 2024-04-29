@@ -3,11 +3,11 @@ import js
 import json
 from scripts.common.camera import Camera, CameraArray
 from scripts.common import util
-from scripts.html_util import build_element, make_action_link, bytes_to_buffer
+from scripts.html_util import build_element, make_action_link, bytes_to_buffer, buffer_to_bytes
 from scripts.data_contexts import DATA_CONTEXTS, UIntContext, HexContext
-from io import StringIO
+import io
 
-VERSION = "v0.0.7"
+VERSION = "v0.0.8"
 DATA_PATH_META = "data/meta/payload_info_{data}.json"
 DATA_PATH_NAMES = "data/meta/camera_names_{data}.txt"
 DATA_PATH_BINARY_ORIGINAL = "data/original/binary/camera_data_{data}.bin"
@@ -405,6 +405,54 @@ class App:
         cls.show_cameras()
 
     @classmethod
+    def load_file_data(cls, data):
+        def process_files(event):
+            target = event.target
+            def select(binary_index, labels):
+                target.files.item(binary_index).arrayBuffer().then(lambda buffer : (
+                    setattr(
+                        cls,
+                        "camera_array",
+                        CameraArray.from_files(
+                            metadata := open(DATA_PATH_META.format(data = data), "r"),
+                            io.BytesIO(buffer_to_bytes(buffer)),
+                            labels
+                        )
+                    ),
+                    metadata.close(),
+                    labels != None and labels.close(),
+                    cls.show_cameras()
+                ))
+
+            labels_index = None
+            if target.files.length == 1:
+                binary_index = 0
+            else:
+                for i in range(target.files.length):
+                    ext = target.files.item(i).name.rsplit(".", maxsplit = 1)[-1]
+                    if ext == "txt":
+                        labels_index = i
+                    elif ext == "bin":
+                        binary_index = i
+            if labels_index == None:
+                try:
+                    select(binary_index, open(DATA_PATH_NAMES.format(data = data), "r"))
+                except FileNotFoundError:
+                    print(f"not found, {DATA_PATH_NAMES.format(data = data)}")
+                    select(binary_index, None)
+            else:
+                target.files.item(labels_index).text().then(lambda text : (
+                    select(binary_index, io.StringIO(text))
+                ))
+            
+        build_element("input", props = {
+            "type": "file",
+            "accept": ".bin,.txt",
+            "onchange": lambda event : process_files(event),
+            "multiple": True
+        }).click()
+
+    @classmethod
     def render_nodes(cls, *nodes):
         cls.app.replaceChildren(*nodes)
 
@@ -443,7 +491,10 @@ class App:
                     ),
                     build_element("td",
                         build_element("button",
-                            "Use data from disk..."
+                            "Import data...",
+                            props = {
+                                "onclick": lambda e : cls.load_file_data(payload_selector.value)
+                            }
                         )
                     )
                 )

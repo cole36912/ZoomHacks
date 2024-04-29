@@ -34,3 +34,7 @@ def bytes_to_buffer(b: bytes):
     for i, x in enumerate(b):
         view.setUint8(i, x)
     return buffer
+
+def buffer_to_bytes(buffer) -> bytes:
+    view = js.DataView.new(buffer)
+    return bytes((view.getUint8(i) for i in range(view.byteLength)))
